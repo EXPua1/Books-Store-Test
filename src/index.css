@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+
+table {
+  width: 100% !important;
+}
+
+form {
+  width: 100%;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-in;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
