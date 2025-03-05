@@ -1,5 +1,5 @@
 export interface Book {
-    id: string; // Меняем на string
+    id: string; 
     title: string;
     author: string;
     category: string;

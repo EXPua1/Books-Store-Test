@@ -28,9 +28,9 @@ const BookTable: React.FC<{ books: Book[] }> = ({ books }) => {
         console.log('Toggling active status for book:', bookId, 'New status:', !isActive);
         updateBook(bookId, {
             isActive: !isActive,
-            modifiedAt: new Date().toISOString(), // Добавляем modifiedAt
+            modifiedAt: new Date().toISOString(), 
         });
-        // Редирект не нужен, так как мы уже на Dashboard
+       
     };
 
     const handleDelete = (e: React.MouseEvent<HTMLButtonElement>, bookId: string) => {
@@ -38,7 +38,7 @@ const BookTable: React.FC<{ books: Book[] }> = ({ books }) => {
         e.stopPropagation();
         console.log('Deleting book:', bookId);
         deleteBook(bookId);
-        // Редирект не нужен, так как мы уже на Dashboard
+       
     };
 
     return (

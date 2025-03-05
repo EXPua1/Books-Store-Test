@@ -6,17 +6,17 @@ interface BookContextType {
     books: Book[];
     fetchBooks: () => void;
     addBook: (book: Omit<Book, 'id' | 'createdAt' | 'modifiedAt' | 'isActive'>) => void;
-    updateBook: (id: string, book: Partial<Book>) => void; // Исправляем тип id
-    deleteBook: (id: string) => void; // Исправляем тип id
-    successMessage: string | null;
-    setSuccessMessage: (message: string | null) => void;
+    updateBook: (id: string, book: Partial<Book>) => void;
+    deleteBook: (id: string) => void;
+    successMessage: { text: string; type: 'success' | 'error' } | null;
+    setSuccessMessage: (message: { text: string; type: 'success' | 'error' } | null) => void;
 }
 
 export const BookContext = createContext<BookContextType | undefined>(undefined);
 
 export const BookProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [books, setBooks] = useState<Book[]>([]);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
     const fetchBooks = async () => {
         try {
@@ -27,7 +27,7 @@ export const BookProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } catch (error) {
             console.error('Error fetching books:', error);
             setBooks([]);
-            setSuccessMessage('Failed to fetch books.');
+            setSuccessMessage({ text: 'Failed to fetch books.', type: 'error' });
         }
     };
 
@@ -47,10 +47,11 @@ export const BookProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (!response.ok) throw new Error('Failed to add book');
             const addedBook = await response.json();
             setBooks((prevBooks) => [...prevBooks, addedBook]);
-            setSuccessMessage('Book added successfully!');
+            setSuccessMessage({ text: 'Book added successfully!', type: 'success' }); // Переносим сюда
         } catch (error) {
             console.error('Error adding book:', error);
-            setSuccessMessage('Failed to add book.');
+            setSuccessMessage({ text: 'Failed to add book.', type: 'error' });
+            throw error;
         }
     };
 
@@ -60,15 +61,13 @@ export const BookProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (!existingBook) throw new Error(`Book with ID ${id} not found`);
 
             const updatedData = {
-                ...existingBook, // Берем текущую книгу
-                ...book, // Перезаписываем переданные поля
-                modifiedAt: new Date().toISOString(), // Обновляем modifiedAt
+                ...existingBook,
+                ...book,
+                modifiedAt: new Date().toISOString(),
             };
 
-            console.log('Updating book with ID:', id, 'Data:', updatedData);
-
             const response = await fetch(`${API_URL}books/${id}`, {
-                method: 'PUT', // Используем PUT для полного обновления
+                method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updatedData),
             });
@@ -77,10 +76,14 @@ export const BookProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setBooks((prevBooks) =>
                 prevBooks.map((b) => (b.id === id ? updatedBook : b))
             );
-            setSuccessMessage(book.isActive !== undefined ? 'Book status updated!' : 'Book updated successfully!');
+            setSuccessMessage({
+                text: book.isActive !== undefined ? 'Book status updated!' : 'Book updated successfully!',
+                type: 'success',
+            });
         } catch (error) {
             console.error('Error updating book:', error);
-            setSuccessMessage('Failed to update book.');
+            setSuccessMessage({ text: 'Failed to update book.', type: 'error' });
+            throw error; 
         }
     };
 
@@ -91,10 +94,11 @@ export const BookProvider: React.FC<{ children: React.ReactNode }> = ({ children
             });
             if (!response.ok) throw new Error('Failed to delete book');
             setBooks((prevBooks) => prevBooks.filter((book) => book.id !== id));
-            setSuccessMessage('Book deleted successfully!');
+            setSuccessMessage({ text: 'Book deleted successfully!', type: 'success' });
         } catch (error) {
             console.error('Error deleting book:', error);
-            setSuccessMessage('Failed to delete book.');
+            setSuccessMessage({ text: 'Failed to delete book.', type: 'error' });
+            throw error; 
         }
     };
 

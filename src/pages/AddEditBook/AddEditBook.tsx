@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { BookContext } from '../../context/BookContext';
+import Toast from '../../components/Toast/Toast';
 
 interface BookFormData {
     title: string;
@@ -16,7 +17,7 @@ const AddEditBook: React.FC = () => {
 
     if (!bookContext) return null;
 
-    const { books, addBook, updateBook, setSuccessMessage } = bookContext;
+    const { books, addBook, updateBook, successMessage, setSuccessMessage } = bookContext;
     const existingBook = id ? books.find((b) => b.id === id) : null;
 
     const [formData, setFormData] = useState<BookFormData>({
@@ -55,7 +56,7 @@ const AddEditBook: React.FC = () => {
     };
 
     const hasChanges = () => {
-        if (!existingBook) return true; 
+        if (!existingBook) return true;
         return (
             formData.title !== existingBook.title ||
             formData.author !== existingBook.author ||
@@ -80,21 +81,28 @@ const AddEditBook: React.FC = () => {
                     ...formData,
                     modifiedAt: new Date().toISOString(),
                 });
-                setSuccessMessage('Book updated successfully');
+                // setSuccessMessage вызывается в BookContext
             } else {
                 console.log('Adding book:', formData);
                 await addBook(formData);
-                setSuccessMessage('Book added successfully');
+                // setSuccessMessage вызывается в BookContext
             }
-            navigate('/');
+            navigate('/'); // Редирект только при успехе
         } catch (error) {
             console.error('Error submitting form:', error);
-            setErrors({ ...errors, title: 'Something went wrong' });
+            // setSuccessMessage уже установлен в BookContext как ошибка
         }
     };
 
     return (
         <div className="w-full flex justify-center p-4">
+            {successMessage && (
+                <Toast
+                    message={successMessage.text}
+                    type={successMessage.type}
+                    onClose={() => setSuccessMessage(null)}
+                />
+            )}
             <form
                 onSubmit={handleSubmit}
                 className="w-full max-w-md min-w-[320px] h-auto space-y-4 bg-white p-6 rounded-lg shadow-md"

@@ -38,17 +38,18 @@ const Dashboard: React.FC = () => {
     return (
         <div className="w-full p-4">
             {successMessage && (
-                <Toast message={successMessage} onClose={() => setSuccessMessage(null)} />
+                <Toast
+                    message={successMessage.text}
+                    type={successMessage.type} 
+                    onClose={() => setSuccessMessage(null)}
+                />
             )}
-            <div className="max-w-[1024px] mx-auto mb-15 ">
-
-
+            <div className="max-w-[1024px] mx-auto mb-15">
                 <div className="flex gap-4 items-center mb-4 justify-between">
-                    <div className="flex items-center  gap-25">
+                    <div className="flex items-center gap-25">
                         <select
                             value={filter}
                             onChange={(e) => {
-
                                 setFilter(e.target.value as typeof filter);
                             }}
                             className="p-2 border rounded"
@@ -59,13 +60,15 @@ const Dashboard: React.FC = () => {
                         </select>
                         <span>Showing {filteredBooks.length} of {books.length}</span>
                     </div>
-                    <Link to="/add" className="bg-blue-600 text text-white! p-2 hover:bg-blue-700 rounded-[12px] flex items-center gap-2">
+                    <Link
+                        to="/add"
+                        className="bg-blue-600 text-white! p-2 hover:bg-blue-700 rounded-[12px] flex items-center gap-2"
+                    >
                         {/* @ts-ignore */}
                         <FaPlus size={12} /> Add a Book
                     </Link>
                 </div>
             </div>
-
             <div className="w-full px-4">
                 <BookTable books={filteredBooks} />
             </div>
